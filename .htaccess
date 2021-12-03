@@ -1,0 +1,1 @@
+RewriteRule ^reservation/?1 http://localhost:8888/truck/reservation/
