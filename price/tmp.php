@@ -10,7 +10,6 @@ $today = $today->format('y-m-d');
 $reservation_data = getDataDef($today);
 foreach ($reservation_data as $k => $val){
   $tmp = [];
-  $tmp = [];
   $tmp['id'] = $val['id'];
   // $weekday = ['日', '月', '火', '水', '木', '金', '土'];
   $progress = (int) $val['progress'];

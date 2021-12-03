@@ -34,7 +34,7 @@ if(!empty($_POST['sales_office'])){
 
 <body>
     <div class="container">
-        <form action="#" method="POST">
+        <form action="/truck/reservation/store.php" method="POST">
             <input type="hidden" name="reservation_id" value="<?php echo $reservation_id;?>">
             <input type="hidden" name="reservation_name" value="<?php echo $reservation_name;?>">
             <input type="hidden" name="start_date" value="<?php echo $start_date;?>">
