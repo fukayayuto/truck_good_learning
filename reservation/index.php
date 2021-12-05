@@ -5,7 +5,7 @@ require "../db/entries.php";
 if(isset($_GET['id'])) {
      $reservation_id = (int) $_GET['id'];
 }
-$data = [];
+$data = array();
 $reservation_data = getReservation($reservation_id);
 if(empty($reservation_data)){
     header('Location: http://localhost:8888/truck/price');

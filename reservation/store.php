@@ -99,13 +99,13 @@ if(!$res){
 $title = $mail_subject_1;
 $mail_text = $mail_body_1;
 
-$email_content_id = emailContentStore($title, $mail_text);
+$email_content_id = emailContentStore($title, $mail_text,$adress_id);
 
 if(empty($email_content_id)){
   die('メールコンテンツに失敗しました');
 }
 
-$res = emailStore($adress_id, $email_content_id);
+$res = emailStore($email_content_id);
 
 if(!$res){
   die('メール失敗しました');

@@ -3,14 +3,13 @@ ini_set('display_errors', "On");
 require "../../db/reservation_settings.php"; 
 require "../../db/entries.php"; 
 
-$data = [];
+$data = array();
 $num = 0;
 $today = new DateTime();
 $today = $today->format('y-m-d');
 $reservation_data = getDataMie($today);
 foreach ($reservation_data as $k => $val){
-  $tmp = [];
-  $tmp = [];
+  $tmp = array();
   $tmp['id'] = $val['id'];
   // $weekday = ['日', '月', '火', '水', '木', '金', '土'];
   $progress = (int) $val['progress'];
@@ -407,8 +406,14 @@ WEBからのご予約は下記受講開始日の<span>席数ボタン</span>か�
             <tr>
               <td><?php echo $val['start_date'] ?><span>(<?php echo $val['start_week'] ?>)</span>～<?php echo $val['end_date']?><span>(<?php echo $val['end_week'] ?>)</span></td>
               <td></td>
-              <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
-            </tr>
+
+              <?php if($val['left_seat'] > 0):?>
+                  <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
+              <?php else:?>
+                 <td><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></td>
+              <?php endif;?>
+         
+                </tr>
             <?php endif;?>
           <?php endforeach; ?>
 			  </tbody>
@@ -419,7 +424,16 @@ WEBからのご予約は下記受講開始日の<span>席数ボタン</span>か�
             <tr>
               <td><?php echo $val['start_date'] ?><span>(<?php echo $val['start_week'] ?>)</span>～<?php echo $val['end_date']?><span>(<?php echo $val['end_week'] ?>)</span></td>
               <td></td>
-              <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
+
+              <?php if($val['left_seat'] > 0):?>
+                  <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
+              <?php else:?>
+                 <td><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></td>
+              <?php endif;?>
+
+            
+
+           
             </tr>
             <?php endif;?>
           <?php endforeach; ?>
