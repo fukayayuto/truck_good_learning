@@ -1,56 +1,124 @@
 <?php
-// $mail = $_POST["mail_address"];
+ini_set('display_errors', "On");
+require "../db/reservation_settings.php"; 
+require "../db/entries.php"; 
+require "../db/accounts.php"; 
+require "../db/mail.php"; 
+
+$name = $_POST['name'];
+$email = $_POST['email'];
+$company_name = $_POST['company_name'];
+$phone = $_POST['phone'];
+$sales_office = $_POST['sales_office'];
+
+$account_id = accountStore($name,$email,$company_name,$phone,$sales_office);
+
+$reservation_id = $_POST['reservation_id'];
+$count = $_POST['count'];
+
+$res = entryStore($account_id,$reservation_id,$count);
+
+if(!$res){
+  die('失敗しました');
+}
+
+
+$mail = $_POST["email"];
 
 // 2通のメールの共通部分
-// $inquiry_content = "-----------------\n";
-// $inquiry_content .= "お問い合わせ内容\n";
-// $inquiry_content .= $_POST["checkBox"] . "\n\n";
-// $inquiry_content .= "会社名\n";
-// $inquiry_content .= $_POST["company"] . "\n\n";
-// $inquiry_content .= "ご担当者名\n";
-// $inquiry_content .= $_POST["inquirer"] . "\n\n";
-// $inquiry_content .= "メールアドレス\n";
-// $inquiry_content .= $mail . "\n\n";
-// $inquiry_content .= "お電話番号\n";
-// $inquiry_content .= $_POST["tel"] . "\n\n";
-// $inquiry_content .= "ご住所\n";
-// $inquiry_content .= $_POST["pref_address"] . "\n\n";
-// $inquiry_content .= "受講開始の時期\n";
-// $inquiry_content .= $_POST["date"] . "\n\n";
-// $inquiry_content .= "受講者の人数\n";
-// $inquiry_content .= $_POST["human"] . "\n\n";
-// $inquiry_content .= "その他(質問・ご相談)\n";
-// $inquiry_content .= $_POST["question"] . "\n";
-// $inquiry_content .= "-----------------";
+$inquiry_content = "このメールはシステムから自動送信しています\n";
+$inquiry_content .= $_POST["name"] . '様\n\n';
+$inquiry_content .= "-----------------\n";
+$inquiry_content .= "予約内容\n";
+$inquiry_content .= $_POST["reservation_name"] . "\n\n";
+$inquiry_content .= "講座期間\n";
+$inquiry_content .= $_POST["start_date"] .'〜'. $_POST["end_date"] ."\n\n";
+$inquiry_content .= "予約人数\n";
+$inquiry_content .= $_POST["count"] .'人'. "\n\n";
+$inquiry_content .= "-----------------";
+
+$inquiry_content = "-----------------\n";
+$inquiry_content .= "お客様情報\n";
+$inquiry_content .= $_POST["name"] . "\n\n";
+$inquiry_content .= "メールアドレス\n";
+$inquiry_content .= $_POST["email"] . "\n\n";
+$inquiry_content .= "会社名\n";
+$inquiry_content .= $_POST["company_name"] . "\n\n";
+$inquiry_content .= "営業所名\n";
+$inquiry_content .= $_POST["sales_office"] . "\n\n";
+$inquiry_content .= "電話番号\n";
+$inquiry_content .= $_POST["phone"] . "\n\n";
+$inquiry_content .= "-----------------";
 
 
 //2通のメールのそれぞれの本文
-$mail_body_1 = "「グッドラーニング！」メールフォームからお問い合わせがありました。\n\n\n";
-// $mail_body_1 .= $inquiry_content;
+$mail_body_1 = "「グッドラーニング！」から予約が入りました。。\n\n\n";
+$mail_body_1 .= $inquiry_content;
 
-$mail_body_2 = "「グッドラーニング！」メールフォームから\n";
-// $mail_body_2 .= "お問い合わせ頂き、ありがとうございます。\n";
-// $mail_body_2 .= "下記内容で受付いたしました。\n\n";
-// $mail_body_2 .= "折り返し、担当者よりご連絡いたしますので、\n";
-// $mail_body_2 .= "恐れ入りますが、しばらくお待ちください。\n\n";
-$mail_body_2 .= $inquiry_content;
+
+$mail_body_2 = "「グッドラーニング！」から\n";
+$mail_body_2 .= $_POST["reservation_name"]."に予約頂き、ありがとうございます。\n";
+$mail_body_2 .= "下記内容で受付いたしました。\n\n";
+$mail_body_2 .= "折り返し、担当者よりご連絡いたしますので、\n";
+$mail_body_2 .= "恐れ入りますが、しばらくお待ちください。\n\n";
+$mail_body_2 .= $inquiry_content . "\n\n";
+$mail_body_2 .= "また、ご不明な点がございましたら\n";
+$mail_body_2 .=  "下記までお気軽にお問い合せくださいませ。\n\n";
+$mail_body_2 .= "-----------------\n";
+$mail_body_2 .= "【運営元：株式会社●●】\n";
+$mail_body_2 .= "住所：〒111-1111　東京都港区●●5-6-7-8\n";
+$mail_body_2 .= "電話番号：000-0000-0000\n";
+$mail_body_2 .= "メール：□□@□□.co.jp\n";
+$mail_body_2 .= "-----------------";
 
 //メールの作成
 $mail_to_1	= "yuto.fukaya@cab-station.com";
-$mail_subject_1	= "【グッドラーニング】お問い合わせ";
-$mail_header_1	= "from:yuto.fukaya@cab-station.com" ;
+$mail_subject_1	= "【グッドラーニング】予約完了メール";
+$mail_header_1	= "from:" . $mail ;
 
-// $mail_to_2	= $mail;
-// $mail_subject_2	= "【グッドラーニング】お問い合わせを受け付けました";
-// $mail_header_2	= "from:yosuke-saito@cab-station.com";
+$mail_to_2	= $mail;
+$mail_subject_2	= "【グッドラーニング】予約確認メール";
+$mail_header_2	= "from:yuto.fukaya@cab-station.com";
 
 //メール送信処理
 mb_language("Japanese");
 mb_internal_encoding("UTF-8");
 
 $mailsousin_1 = mb_send_mail($mail_to_1, $mail_subject_1, $mail_body_1, $mail_header_1);
-// $mailsousin_2 = mb_send_mail($mail_to_2, $mail_subject_2, $mail_body_2, $mail_header_2);
-?><!DOCTYPE html>
+$mailsousin_2 = mb_send_mail($mail_to_2, $mail_subject_2, $mail_body_2, $mail_header_2);
+
+$adress_id = getAdressId();
+$adress_id++;
+
+$res = adressListStore($adress_id, $account_id);
+
+if(!$res){
+  die('アドレスリスト失敗しました');
+}
+
+$title = $mail_subject_1;
+$mail_text = $mail_body_1;
+
+$email_content_id = emailContentStore($title, $mail_text);
+
+if(empty($email_content_id)){
+  die('メールコンテンツに失敗しました');
+}
+
+$res = emailStore($adress_id, $email_content_id);
+
+if(!$res){
+  die('メール失敗しました');
+}
+
+
+
+
+
+
+?>
+
+<!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />

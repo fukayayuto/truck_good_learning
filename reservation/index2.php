@@ -56,11 +56,9 @@ $left_seat = $reservation_total_seat - $used_seat;
 
 ?>
 
-
 <!DOCTYPE html>
 <html lang="ja">
-
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>
@@ -120,9 +118,11 @@ $left_seat = $reservation_total_seat - $used_seat;
     <?php @include($_SERVER['DOCUMENT_ROOT']."/truck/common/inc/head_before.inc")?>
   </head>
 
-<body>
-<div id="wrapper">
-<header>
+  <body>
+    <?php @include($_SERVER['DOCUMENT_ROOT']."/truck/common/inc/body_after.inc")?>
+    <div id="wrapper">
+      <!-- header// -->
+      <header>
         <div id="header">
           <p id="headLogo">
             <a href="/truck/"
@@ -152,8 +152,10 @@ $left_seat = $reservation_total_seat - $used_seat;
           </nav>
         </div>
       </header>
-
-    <div class="container">
+      <!-- //header -->
+      <!-- main// -->
+      <main>
+      <div class="container">
 
         <form method="POST" action="/truck/reservation/check.php" id="form_1">
 
@@ -161,7 +163,7 @@ $left_seat = $reservation_total_seat - $used_seat;
             <input type="hidden" name="reservation_name" value="<?php echo $data['name'];?>">
             <input type="hidden" name="start_date" value="<?php echo $data['start_date'];?>">
             <input type="hidden" name="end_date" value="<?php echo $data['end_date'];?>">
-       
+
             <h2>受講予約画面</h2><br>
 
             <label>受講名:</label>：
@@ -177,7 +179,7 @@ $left_seat = $reservation_total_seat - $used_seat;
                             case 1:
                     ?>
                         <option value="1">1人</option>
-                     <?php break; ?>
+                    <?php break; ?>
                     <?php case 2: ?>
                         <option value="1">1人</option>
                         <option value="2">2人</option>              
@@ -215,7 +217,7 @@ $left_seat = $reservation_total_seat - $used_seat;
             </div>
             <div class="form-group">
                 <label>会社名</label>
-                <input type="text" class="form-control validate[required]" id="company_name" placeholder="会社名" name="company_name">
+                <input type="text" class="form-control" id="company_name" placeholder="会社名" name="company_name">
             </div>
             <div class="form-group">
                 <label>営業所</label>
@@ -223,14 +225,59 @@ $left_seat = $reservation_total_seat - $used_seat;
             </div>
             <div class="form-group">
                 <label>電話番号</label>
-                <input type="text" class="form-control validate[required,custom[phone]" id="phone" placeholder="電話番号" name="phone">
-                <small id="phoneHelp" class="form-text text-muted">ハイフンありで入力してください</small>
+                <input type="text" class="form-control" id="phone" placeholder="電話番号" name="phone">
+                <small id="phoneHelp" class="form-text text-muted">ハイフンなしで入力してください</small>
             </div>
             <button type="submit" class="btn btn-primary">確認画面へ</button>
         </form>
+        </div>
+      </main>
+      <!-- //main -->
+      <!-- footer// -->
+      <footer>
+        <div class="inner">
+          <div class="footLogo">
+            <img
+              src="../common/img/shared/foot_logo.svg"
+              alt="グッドラーニング"
+              width=""
+              height=""
+              loading="lazy"
+            />
+          </div>
+          <ul class="footNav">
+            <li><a href="/truck/">ホーム</a></li>
+            <li><a href="/truck/price/">料金について</a></li>
+            <li><a href="/truck/flow/">ご利用の流れ</a></li>
+            <li><a href="/truck/adopt/">ご採用実績</a></li>
+            <li><a href="/truck/faq/">FAQ</a></li>
+            <li><a href="/truck/contact/">お問い合わせ</a></li>
+          </ul>
+        </div>
+        <div id="copy">
+          <div class="inner">
+            <ul class="footSub">
+              <li>
+                <a href="https://cab-station.com/privacy.html" target="_blank"
+                  >プライバシーポリシー</a
+                >
+              </li>
+              <li>
+                <a href="https://cab-station.com/company.html" target="_blank"
+                  >会社概要</a
+                >
+              </li>
+            </ul>
+            <p>© <?php echo date('Y');?> Cab Station Co., Ltd.</p>
+          </div>
+        </div>
+      </footer>
+      <!-- //footer -->
     </div>
-</div>
-
+    <!-- js -->
+    <script src="../common/js/common.js"></script>
+    <script src="../common/js/jquery.validationEngine.js"></script>
+    <script src="../common/js/jquery.validationEngine-ja.js"></script>
     <script>
       jQuery(function () {
         jQuery("#form_1").validationEngine({validateNonVisibleFields: true,promptPosition:'inline'});
@@ -252,9 +299,6 @@ $left_seat = $reservation_total_seat - $used_seat;
         });
       });
     </script>
-    <script src="../common/js/common.js"></script>
-    <script src="../common/js/jquery.validationEngine.js"></script>
-    <script src="../common/js/jquery.validationEngine-ja.js"></script>
-</body>
-
+    <?php @include($_SERVER['DOCUMENT_ROOT']."/truck/common/inc/js_after.inc")?>
+  </body>
 </html>

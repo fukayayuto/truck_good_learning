@@ -407,7 +407,7 @@ WEBからのご予約は下記受講開始日の<span>席数ボタン</span>か�
             <tr>
               <td><?php echo $val['start_date'] ?><span>(<?php echo $val['start_week'] ?>)</span>～<?php echo $val['end_date']?><span>(<?php echo $val['end_week'] ?>)</span></td>
               <td></td>
-              <td><a href="/truck/reservation/<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
+              <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
             </tr>
             <?php endif;?>
           <?php endforeach; ?>
@@ -419,7 +419,7 @@ WEBからのご予約は下記受講開始日の<span>席数ボタン</span>か�
             <tr>
               <td><?php echo $val['start_date'] ?><span>(<?php echo $val['start_week'] ?>)</span>～<?php echo $val['end_date']?><span>(<?php echo $val['end_week'] ?>)</span></td>
               <td></td>
-              <td><a href="/truck/reservation/<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
+              <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
             </tr>
             <?php endif;?>
           <?php endforeach; ?>

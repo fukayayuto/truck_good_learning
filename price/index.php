@@ -434,8 +434,8 @@ WEBからのご予約は下記受講開始日の<span>席数ボタン</span>か�
             <?php if($val['display'] == 1):?>
             <tr>
               <td><?php echo $val['start_date'] ?><span>(<?php echo $val['start_week'] ?>)</span>～<?php echo $val['end_date']?><span>(<?php echo $val['end_week'] ?>)</span></td>
-              <td><a href="/truck/reservation/<?php echo $val['id_nomember'] ?>"><button class="normal">残り<span><?php echo $val['left_seat_nomember'];?></span>席</button></a></td>
-              <td><a href="/truck/reservation/<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
+              <td><a href="/truck/reservation/?id=<?php echo $val['id_nomember'] ?>"><button class="normal">残り<span><?php echo $val['left_seat_nomember'];?></span>席</button></a></td>
+              <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
             </tr>
             <?php endif;?>
           <?php endforeach; ?>
@@ -507,6 +507,8 @@ WEBからのご予約は下記受講開始日の<span>席数ボタン</span>か�
     </div>
     <!-- js -->
     <script src="../common/js/common.js"></script>
+    <script src="../common/js/jquery.validationEngine.js"></script>
+    <script src="../common/js/jquery.validationEngine-ja.js"></script>
     <script>
         $('#more').on('click', function() {
             $('#display').show();
