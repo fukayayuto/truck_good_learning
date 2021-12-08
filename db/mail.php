@@ -1,17 +1,10 @@
 <?php
 
+require_once 'db.php';
 
 function getAdressId(){
     
-    try {
-        /// DB接続を試みる
-        $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-        $msg = "MySQL への接続確認が取れました。";
-        } catch (PDOException $e) {
-        $isConnect = false;
-        $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-        }
-
+    $pdo = dbConect();
 
     $stmt = $pdo->prepare("SELECT MAX(adress_id) as id FROM adress_lists ");
     $res = $stmt->execute();
@@ -28,14 +21,8 @@ function getAdressId(){
 
 function adressListStore($adress_id, $account_id){
     
-    try {
-        /// DB接続を試みる
-        $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-        $msg = "MySQL への接続確認が取れました。";
-        } catch (PDOException $e) {
-        $isConnect = false;
-        $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-        }
+    $pdo = dbConect();
+
     $stmt = $pdo->prepare("INSERT INTO adress_lists (
             account_id, adress_id
         ) VALUES (
@@ -52,14 +39,8 @@ function adressListStore($adress_id, $account_id){
     
 function emailContentStore($title, $mail_text,$adress_id){
     
-        try {
-            /// DB接続を試みる
-            $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-            $msg = "MySQL への接続確認が取れました。";
-            } catch (PDOException $e) {
-            $isConnect = false;
-            $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-            }
+       $pdo = dbConect();
+
         $stmt = $pdo->prepare("INSERT INTO email_contents (
                 title, mail_text,adress_id
             ) VALUES (
@@ -82,14 +63,8 @@ function emailContentStore($title, $mail_text,$adress_id){
     
 function emailStore($email_content_id){
     
-    try {
-        /// DB接続を試みる
-        $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-        $msg = "MySQL への接続確認が取れました。";
-        } catch (PDOException $e) {
-        $isConnect = false;
-        $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-        }
+    $pdo = dbConect();
+    
     $stmt = $pdo->prepare("INSERT INTO emails (
             email_content_id, type
         ) VALUES (
@@ -98,6 +73,21 @@ function emailStore($email_content_id){
     $stmt->bindValue(':email_content_id', $email_content_id, PDO::PARAM_INT);
     $stmt->bindValue(':type', 1, PDO::PARAM_INT);
     $res = $stmt->execute();
+
+    $pdo = null;
+
+    return $res;
+}
+
+function getContentData(){
+    
+    $pdo = dbConect();
+    
+    $stmt = $pdo->prepare("SELECT * FROM email_contents WHERE id = :id");
+    $stmt->bindValue(':id', 6, PDO::PARAM_INT);
+    $res = $stmt->execute();
+
+    $data = $stmt->fetch();
 
     $pdo = null;
 

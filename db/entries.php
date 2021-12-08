@@ -1,21 +1,9 @@
 <?php
-// defineの値は環境によって変えてください。
-// define('HOSTNAME', 'localhost');
-// define('DATABASE', 'e_learning');
-// define('USERNAME', 'root');
-// define('PASSWORD', 'root');
+require_once 'db.php';
 
 function entryStore($account_id,$reservation_id,$count){
     
-    try {
-        /// DB接続を試みる
-        $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-        $msg = "MySQL への接続確認が取れました。";
-        } catch (PDOException $e) {
-        $isConnect = false;
-        $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-        }
-
+    $pdo = dbConect();
 
     $stmt = $pdo->prepare("INSERT INTO entries (
                 account_id, reservation_id, count
@@ -34,15 +22,7 @@ function entryStore($account_id,$reservation_id,$count){
 
 function getEntry($id){
     
-    try {
-        /// DB接続を試みる
-        $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-        $msg = "MySQL への接続確認が取れました。";
-        } catch (PDOException $e) {
-        $isConnect = false;
-        $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-        }
-
+    $pdo = dbConect();
 
     $stmt = $pdo->prepare("SELECT * FROM entries WHERE reservation_id = :id ");
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);

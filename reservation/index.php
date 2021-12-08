@@ -1,10 +1,13 @@
+
 <?php
 ini_set('display_errors', "On");
 require "../db/reservation_settings.php"; 
+require "../db/reservation.php"; 
 require "../db/entries.php";
 if(isset($_GET['id'])) {
      $reservation_id = (int) $_GET['id'];
 }
+
 $data = array();
 $reservation_data = getReservation($reservation_id);
 if(empty($reservation_data)){
@@ -12,37 +15,24 @@ if(empty($reservation_data)){
 }
 $data['id'] = $reservation_data['id'];
 
-switch ($reservation_data['place']) {
-    case 1:
-        $data['name'] = '【ユーザー限定】グッドラーニング！初任運転者講習（受講開始日で予約、最長７日間まで受講可能）';
-        break;
-    case 2:
-        $data['name'] = '予約受付中グッドラーニング！初任運転者講習（受講開始日で予約、最長７日間まで受講可能）';
-        break;
-    case 11:
-        $data['name'] = '【三重県トラック協会】グッドラーニング！初任運転者講習（受講開始日で予約、最長５日間まで受講可能）';
-        break;
-    case 21:
-        $data['name'] = '【京都府トラック協会】グッドラーニング！初任運転者講習（受講開始日で予約、最長５日間まで受講可能）';
-        break;
-    default:
-        break;
-}
+$reserve_data = getReservatinData($reservation_data['place']);
+$data['name'] = $reserve_data['name'];
+
 $start_date = new DateTime($reservation_data['start_date']);
   
-$data['start_date'] = $start_date->format('m月d日');
+$data['start_date'] = $start_date->format('n月j日');
 $week = array( "日", "月", "火", "水", "木", "金", "土" );
 $data['start_week'] = $week[$start_date->format("w")];
 
-$progress = $reservation_data['progress'];
+$progress = $reserve_data['progress'] - 1;
 
 $start_date = new DateTime($reservation_data['start_date']);
 
 $end_date = $start_date->modify('+' .$progress . 'days');
-$data['end_date'] = $end_date->format('m月d日');
+$data['end_date'] = $end_date->format('n月j日');
 $data['end_week'] = $week[$end_date->format("w")];
 
-$reservation_total_seat = $reservation_data['count'];
+$reservation_total_seat = $reserve_data['count'];
 $used_seat = 0;
 
 $entry = getEntry($reservation_data['id']);
@@ -56,36 +46,34 @@ $left_seat = $reservation_total_seat - $used_seat;
 
 ?>
 
-
 <!DOCTYPE html>
 <html lang="ja">
-
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>
-      お問い合わせ・受講体験｜トラックドライバー教育のクラウド型eラーニング【グッドラーニング!】
+      初任運転者講習受講予約｜トラックドライバー教育のクラウド型eラーニング【グッドラーニング!】
     </title>
     <meta
       name="title"
-      content="お問い合わせ・受講体験｜トラックドライバー教育のクラウド型eラーニング【グッドラーニング!】"
+      content="初任運転者講習受講予約｜トラックドライバー教育のクラウド型eラーニング【グッドラーニング!】"
     />
     <meta
       name="description"
-      content="グッドラーニング！についてのお問い合わせ・受講体験はこちらから受け付けております。お気軽にお問合せください。"
+      content="グッドラーニング！についての初任運転者講習受講予約はこちらから受け付けております。お気軽にお問合せください。"
     />
     <meta
       name="keywords"
-      content="乗務員,教育,研修,Eラーニング,指導,国交省,トラック,運送業,グッドラーニング"
+      content="乗務員,教育,講習,Eラーニング,指導,国交省,トラック,運送業,グッドラーニング"
     />
     <meta
       property="og:title"
-      content="お問い合わせ・受講体験｜トラックドライバー教育のクラウド型eラーニング【グッドラーニング!】"
+      content="初任運転者講習受講予約｜トラックドライバー教育のクラウド型eラーニング【グッドラーニング!】"
     />
     <meta property="og:type" content="article" />
     <meta
       property="og:url"
-      content="https://promote.good-learning.jp/truck/contact/"
+      content="https://promote.good-learning.jp/truck/reserve/"
     />
     <meta
       property="og:image"
@@ -97,11 +85,11 @@ $left_seat = $reservation_total_seat - $used_seat;
     />
     <meta
       property="og:description"
-      content="グッドラーニング！についてのお問い合わせ・受講体験はこちらから受け付けております。お気軽にお問合せください。"
+      content="初任運転者講習受講予約はこちらから受け付けております。お気軽にお問合せください。"
     />
     <link
       rel="canonical"
-      href="https://promote.good-learning.jp/truck/contact/"
+      href="https://promote.good-learning.jp/truck/reserve/"
     />
     <link rel="stylesheet" href="https://use.typekit.net/hcg7pyj.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -117,12 +105,23 @@ $left_seat = $reservation_total_seat - $used_seat;
     <link href="../common/css/content.css" rel="stylesheet" type="text/css" />
     <link href="../common/css/validationEngine.jquery.css" rel="stylesheet" type="text/css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <?php @include($_SERVER['DOCUMENT_ROOT']."/truck/common/inc/head_before.inc")?>
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WHJMK5S');</script>
+<!-- End Google Tag Manager -->
   </head>
 
-<body>
-<div id="wrapper">
-<header>
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WHJMK5S"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <div id="wrapper">
+      <!-- header// -->
+      <header>
         <div id="header">
           <p id="headLogo">
             <a href="/truck/"
@@ -138,99 +137,175 @@ $left_seat = $reservation_total_seat - $used_seat;
             <span>トラックドライバー教育</span>のクラウド型eラーニング
           </p>
         </div>
-        <div id="global">
-          <div id="navTrigger"><span>&nbsp;</span></div>
-          <nav>
-            <ul>
-              <li><a href="/truck/">HOME</a></li>
-              <li><a href="/truck/price/">料金について</a></li>
-              <li><a href="/truck/flow/">ご利用の流れ</a></li>
-              <li><a href="/truck/adopt/">ご採用実績</a></li>
-              <li><a href="/truck/faq/">FAQ</a></li>
-              <li><a href="/truck/contact/">お問い合わせ</a></li>
-            </ul>
-          </nav>
-        </div>
       </header>
+      <!-- //header -->
+      <!-- main// -->
+      <main>
+        <div id="pageTit">
+          <h1>初任運転者講習受講予約</h1>
+          <div id="breadCrumbs">
+            <ol itemscope="" itemtype="https://schema.org/BreadcrumbList">
+              <li
+                itemprop="itemListElement"
+                itemscope=""
+                itemtype="https://schema.org/ListItem"
+              >
+                <a href="/truck/" itemprop="item"
+                  ><span itemprop="name">HOME</span></a
+                ><meta itemprop="position" content="1" />
+              </li>
+              <li>初任運転者講習受講予約</li>
+            </ol>
+          </div>
+        </div>
+        <div class="inner mt40">
+          <div id="contact">
+            <form action="confirm.php" method="post" id="form_1">
 
-    <div class="container">
+            <input type="hidden" name="id" id="id" value="<?php echo $data['id'];?>">
+            <input type="hidden" name="reservation_name" id="reservation_name" value="<?php echo $data['name'];?>">
+            <input type="hidden" name="start_date" id="start_date" value="<?php echo $data['start_date'];?>">
+            <input type="hidden" name="start_week" id="start_week" value="<?php echo $data['start_week'];?>">
+            <input type="hidden" name="end_date" id="end_date" value="<?php echo $data['end_date'];?>">
+            <input type="hidden" name="end_week" id="end_week" value="<?php echo $data['end_week'];?>">
 
-        <form method="POST" action="/truck/reservation/check.php" id="form_1">
-
-            <input type="hidden" name="reservation_id" value="<?php echo $data['id'];?>">
-            <input type="hidden" name="reservation_name" value="<?php echo $data['name'];?>">
-            <input type="hidden" name="start_date" value="<?php echo $data['start_date'];?>">
-            <input type="hidden" name="end_date" value="<?php echo $data['end_date'];?>">
-       
-            <h2>受講予約画面</h2><br>
-
-            <label>受講名:</label>：
-            <?php echo $data['name'];?><br>
-            <label>受講期間:</label>
-            <?php echo $data['start_date'] . '(' . $data['start_week'] .')' .'〜' . $data['end_date'] . '(' . $data['end_week'] .')' ; ?><br>
-
-            <div class="form-group">
-                <label>人数選択</label>
-                <select class="form-control" name="count" id="count">
-                    <?php
-                        switch ( $left_seat ):
-                            case 1:
-                    ?>
-                        <option value="1">1人</option>
-                     <?php break; ?>
-                    <?php case 2: ?>
-                        <option value="1">1人</option>
-                        <option value="2">2人</option>              
-                        <?php break; ?>
-                    <?php case 3: ?>
-                        <option value="1">1人</option>
-                        <option value="2">2人</option>
-                        <option value="3">3人</option>
-                        <?php break; ?>
-                    <?php case 4: ?>
-                        <option value="1">1人</option>
-                        <option value="2">2人</option>
-                        <option value="3">3人</option>
-                        <option value="4">4人</option>
-                        <?php break; ?>
-                    <?php case 5: ?>
-                        <option value="1">1人</option>
-                        <option value="2">2人</option>
-                        <option value="3">3人</option>
-                        <option value="4">4人</option>
-                        <option value="5">5人</option>
-                        <?php break; ?>
-                        <?php endswitch; ?>
-
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>氏名</label>
-                <input type="text" class="form-control validate[required]" id="name" placeholder="氏名" name="name">
-            </div>
-            <div class="form-group">
-                <label>メールアドレス</label>
-                <input type="email" class="form-control validate[required,custom[email]]" id="email" placeholder="メールアドレス" name="email">
-            </div>
-            <div class="form-group">
-                <label>会社名</label>
-                <input type="text" class="form-control validate[required]" id="company_name" placeholder="会社名" name="company_name">
-            </div>
-            <div class="form-group">
-                <label>営業所</label>
-                <input type="text" class="form-control" id="sales_office" placeholder="営業所" name="sales_office">
-            </div>
-            <div class="form-group">
-                <label>電話番号</label>
-                <input type="text" class="form-control validate[required,custom[phone]" id="phone" placeholder="電話番号" name="phone">
-                <small id="phoneHelp" class="form-text text-muted">ハイフンありで入力してください</small>
-            </div>
-            <button type="submit" class="btn btn-primary">確認画面へ</button>
-        </form>
+              <dl>
+				  <dt>受講名</dt>
+				  <dd class="setDate"><?php echo $data['name'];?></dd>
+				  <dt>受講期間</dt>
+				  <dd class="setDate"><?php echo $data['start_date'] . '(' . $data['start_week'] .')' .'〜' . $data['end_date'] . '(' . $data['end_week'] .')' ; ?></dd>
+                <dt>受講人数<span>必須</span></dt>
+                <dd class="date">
+                  
+                  <select name="count" id="count">
+                  <?php
+                       switch ( $left_seat ):
+                           case 1:
+                   ?>
+                       <option value="1">1人</option>
+                    <?php break; ?>
+                   <?php case 2: ?>
+                       <option value="1">1人</option>
+                       <option value="2">2人</option>              
+                       <?php break; ?>
+                   <?php case 3: ?>
+                       <option value="1">1人</option>
+                       <option value="2">2人</option>
+                       <option value="3">3人</option>
+                       <?php break; ?>
+                   <?php case 4: ?>
+                       <option value="1">1人</option>
+                       <option value="2">2人</option>
+                       <option value="3">3人</option>
+                       <option value="4">4人</option>
+                       <?php break; ?>
+                   <?php case 5: ?>
+                       <option value="1">1人</option>
+                       <option value="2">2人</option>
+                       <option value="3">3人</option>
+                       <option value="4">4人</option>
+                       <option value="5">5人</option>
+                       <?php break; ?>
+                       <?php endswitch; ?>
+					  
+					        </select>
+                </dd>
+                <dt>氏名<span>必須</span></dt>
+                <dd>
+                  <input
+                    type="text"
+                    class="form-control input-lg validate[required]"
+                    id="name"
+                    name="name"
+                    placeholder="例）山田 太郎"
+                  />
+                </dd>
+                <dt>メールアドレス<span>必須</span></dt>
+                <dd>
+                  <input
+                    type="text"
+                    class="
+                      form-control
+                      input-lg
+                      validate[required,custom[email]]
+                    "
+                    id="email"
+                    name="email"
+                    placeholder="例）test@gmail.co.jp"
+                  />
+                </dd>
+                <dt>会社名<span>必須</span></dt>
+                <dd>
+                  <input
+                    type="text"
+                    class="form-control input-lg validate[required]"
+                    id="company_name"
+                    name="company_name"
+                    placeholder="例）株式会社キャブステーション"
+                  />
+                </dd>
+                <dt>営業所</dt>
+                <dd>
+                  <input
+                    type="text"
+                    class="form-control input-lg"
+                    id="sales_office"
+                    name="sales_office"
+                    placeholder="例）営業部"
+                  />
+                </dd>
+                <dt>お電話番号<span>必須</span></dt>
+                <dd>
+                  <input
+                    type="tel"
+                    class="form-control input-lg validate[required]"
+                    id="phone"
+                    name="phone"
+                    placeholder="例）0120-1234-5678"
+                  />
+                </dd>
+                
+              </dl>
+              <ul class="formBtn">
+                <li>
+                  <input
+                    type="submit"
+                    class="baseSubmit"
+                    value="確認画面へ進む"
+                  />
+                </li>
+              </ul>
+            </form>
+          </div>
+        </div>
+      </main>
+      <!-- //main -->
+      <!-- footer// -->
+      <footer>
+        <div id="copy">
+          <div class="inner">
+            <ul class="footSub">
+              <li>
+                <a href="https://cab-station.com/privacy.html" target="_blank"
+                  >プライバシーポリシー</a
+                >
+              </li>
+              <li>
+                <a href="https://cab-station.com/company.html" target="_blank"
+                  >会社概要</a
+                >
+              </li>
+            </ul>
+            <p>© 2021 Cab Station Co., Ltd.</p>
+          </div>
+        </div>
+      </footer>
+      <!-- //footer -->
     </div>
-</div>
-
+    <!-- js -->
+    <script src="../common/js/common.js"></script>
+    <script src="../common/js/jquery.validationEngine.js"></script>
+    <script src="../common/js/jquery.validationEngine-ja.js"></script>
     <script>
       jQuery(function () {
         jQuery("#form_1").validationEngine({validateNonVisibleFields: true,promptPosition:'inline'});
@@ -252,9 +327,6 @@ $left_seat = $reservation_total_seat - $used_seat;
         });
       });
     </script>
-    <script src="../common/js/common.js"></script>
-    <script src="../common/js/jquery.validationEngine.js"></script>
-    <script src="../common/js/jquery.validationEngine-ja.js"></script>
-</body>
-
+    
+  </body>
 </html>

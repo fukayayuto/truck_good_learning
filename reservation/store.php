@@ -19,57 +19,52 @@ $count = $_POST['count'];
 $res = entryStore($account_id,$reservation_id,$count);
 
 if(!$res){
-  die('失敗しました');
+  die('アカウント登録に失敗しました');
 }
 
 
 $mail = $_POST["email"];
 
 // 2通のメールの共通部分
-$inquiry_content = "このメールはシステムから自動送信しています\n";
-$inquiry_content .= $_POST["name"] . '様\n\n';
-$inquiry_content .= "-----------------\n";
+$inquiry_content .= "申し込み情報\n";
+$inquiry_content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 $inquiry_content .= "予約内容\n";
-$inquiry_content .= $_POST["reservation_name"] . "\n\n";
-$inquiry_content .= "講座期間\n";
-$inquiry_content .= $_POST["start_date"] .'〜'. $_POST["end_date"] ."\n\n";
-$inquiry_content .= "予約人数\n";
-$inquiry_content .= $_POST["count"] .'人'. "\n\n";
-$inquiry_content .= "-----------------";
+$inquiry_content .= "講座名 : " . $_POST["reservation_name"] . "\n";
+$inquiry_content .= "講座期間:" . $_POST["start_date"] .'〜'. $_POST["end_date"] . "\n";
+$inquiry_content .= "予約人数:" . $_POST["count"] .'人'. "\n\n";
 
-$inquiry_content = "-----------------\n";
 $inquiry_content .= "お客様情報\n";
-$inquiry_content .= $_POST["name"] . "\n\n";
-$inquiry_content .= "メールアドレス\n";
-$inquiry_content .= $_POST["email"] . "\n\n";
-$inquiry_content .= "会社名\n";
-$inquiry_content .= $_POST["company_name"] . "\n\n";
-$inquiry_content .= "営業所名\n";
-$inquiry_content .= $_POST["sales_office"] . "\n\n";
-$inquiry_content .= "電話番号\n";
-$inquiry_content .= $_POST["phone"] . "\n\n";
-$inquiry_content .= "-----------------";
+$inquiry_content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+$inquiry_content .= "氏名:" . $_POST["name"] . "様\n";
+$inquiry_content .= "メールアドレス:". $_POST["email"] . "\n";
+$inquiry_content .= "会社名:". $_POST["company_name"] . "\n";
+$inquiry_content .= "営業所:" . $_POST["sales_office"] . "\n";
+$inquiry_content .= "電話番号:". $_POST["phone"] . "\n";
 
 
 //2通のメールのそれぞれの本文
-$mail_body_1 = "「グッドラーニング！」から予約が入りました。。\n\n\n";
+$mail_body_1 = "齋藤様\n\n";
+$mail_body_1 .= "このメールはシステムから自動送信しています。\n";
+$mail_body_1 .= "「グッドラーニング！」から予約が入りました。\n\n\n";
 $mail_body_1 .= $inquiry_content;
 
 
-$mail_body_2 = "「グッドラーニング！」から\n";
-$mail_body_2 .= $_POST["reservation_name"]."に予約頂き、ありがとうございます。\n";
-$mail_body_2 .= "下記内容で受付いたしました。\n\n";
-$mail_body_2 .= "折り返し、担当者よりご連絡いたしますので、\n";
-$mail_body_2 .= "恐れ入りますが、しばらくお待ちください。\n\n";
+
+$mail_body_2 = $_POST["name"] . "様 \n";
+$mail_body_2 .= "このメールはシステムから自動送信しています\n\n";
+$mail_body_2 .= "「グッドラーニング！」より\n";
+$mail_body_2 .= "【" . $_POST["reservation_name"] . "】\n";
+$mail_body_2 .= "に予約頂き、ありがとうございます。\n";
+$mail_body_2 .= "下記内容で受付いたしました。\n";
+$mail_body_2 .= "折り返し、担当者よりご連絡いたしますので、恐れ入りますが、しばらくお待ちください。\n\n";
 $mail_body_2 .= $inquiry_content . "\n\n";
-$mail_body_2 .= "また、ご不明な点がございましたら\n";
-$mail_body_2 .=  "下記までお気軽にお問い合せくださいませ。\n\n";
-$mail_body_2 .= "-----------------\n";
-$mail_body_2 .= "【運営元：株式会社●●】\n";
-$mail_body_2 .= "住所：〒111-1111　東京都港区●●5-6-7-8\n";
-$mail_body_2 .= "電話番号：000-0000-0000\n";
-$mail_body_2 .= "メール：□□@□□.co.jp\n";
-$mail_body_2 .= "-----------------";
+$mail_body_2 .= "また、ご不明な点がございましたら、下記までお気軽にお問い合せくださいませ\n\n";
+$mail_body_2 .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+$mail_body_2 .= "【運営元：株式会社キャブステーション】\n";
+$mail_body_2 .= "住所：〒141-0031　東京都品川区西五反田7-22-17 TOCビル 3階\n";
+$mail_body_2 .= "電話番号：03-6880-1011\n";
+$mail_body_2 .= "メールアドレス：yosuke-saito@cab-station.com\n";
+$mail_body_2 .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
 
 //メールの作成
 $mail_to_1	= "yuto.fukaya@cab-station.com";
@@ -78,7 +73,7 @@ $mail_header_1	= "from:" . $mail ;
 
 $mail_to_2	= $mail;
 $mail_subject_2	= "【グッドラーニング】予約確認メール";
-$mail_header_2	= "from:yuto.fukaya@cab-station.com";
+$mail_header_2	= "from:yosuke-saito@cab-station.com";
 
 //メール送信処理
 mb_language("Japanese");
@@ -87,28 +82,30 @@ mb_internal_encoding("UTF-8");
 $mailsousin_1 = mb_send_mail($mail_to_1, $mail_subject_1, $mail_body_1, $mail_header_1);
 $mailsousin_2 = mb_send_mail($mail_to_2, $mail_subject_2, $mail_body_2, $mail_header_2);
 
+
+
 $adress_id = getAdressId();
 $adress_id++;
 
 $res = adressListStore($adress_id, $account_id);
 
 if(!$res){
-  die('アドレスリスト失敗しました');
+  die('1');
 }
 
-$title = $mail_subject_1;
-$mail_text = $mail_body_1;
+$title = $mail_subject_2;
+$mail_text = $mail_body_2;
 
 $email_content_id = emailContentStore($title, $mail_text,$adress_id);
 
 if(empty($email_content_id)){
-  die('メールコンテンツに失敗しました');
+  die('2');
 }
 
 $res = emailStore($email_content_id);
 
 if(!$res){
-  die('メール失敗しました');
+  die('3');
 }
 
 

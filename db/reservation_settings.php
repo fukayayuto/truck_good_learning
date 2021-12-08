@@ -1,20 +1,7 @@
 <?php
-// defineの値は環境によって変えてください。
-define('HOSTNAME', 'localhost');
-define('DATABASE', 'good_learning');
-define('USERNAME', 'root');
-define('PASSWORD', 'root');
 
-function dbconect(){
-    try {
-    /// DB接続を試みる
-    $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-    $msg = "MySQL への接続確認が取れました。";
-    } catch (PDOException $e) {
-    $isConnect = false;
-    $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-    }
-}
+require_once 'db.php';
+
 
 function getData(){
     
@@ -44,20 +31,13 @@ function getData(){
 
 function getDataDef($today){
 
-    try {
-        /// DB接続を試みる
-        $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-        $msg = "MySQL への接続確認が取れました。";
-        } catch (PDOException $e) {
-        $isConnect = false;
-        $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-        }
+    $pdo = dbConect();
 
     $stmt = $pdo->prepare("SELECT * FROM reservation_settings WHERE place = :place and start_date > :today");
     $stmt->bindValue(':place', 1, PDO::PARAM_INT);
     $stmt->bindValue(':today', $today, PDO::PARAM_STR);
     $res = $stmt->execute();
-    
+    $data = null;
     if( $res ) {
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -69,14 +49,7 @@ function getDataDef($today){
 
 function getDataNomember($start_date){
 
-    try {
-        /// DB接続を試みる
-        $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-        $msg = "MySQL への接続確認が取れました。";
-        } catch (PDOException $e) {
-        $isConnect = false;
-        $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-        }
+    $pdo = dbConect();
 
     $stmt = $pdo->prepare("SELECT * FROM reservation_settings WHERE place = :place and start_date = :today ");
     $stmt->bindValue(':place', 2, PDO::PARAM_INT);
@@ -95,14 +68,7 @@ function getDataNomember($start_date){
 
 function getDataMie($today){
 
-    try {
-        /// DB接続を試みる
-        $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-        $msg = "MySQL への接続確認が取れました。";
-        } catch (PDOException $e) {
-        $isConnect = false;
-        $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-        }
+    $pdo = dbConect();
 
     $stmt = $pdo->prepare("SELECT * FROM reservation_settings WHERE place = :place and start_date > :today");
     $stmt->bindValue(':place', 11, PDO::PARAM_INT);
@@ -121,15 +87,8 @@ function getDataMie($today){
 
 function getReservation($id){
 
-    try {
-        /// DB接続を試みる
-        $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-        $msg = "MySQL への接続確認が取れました。";
-        } catch (PDOException $e) {
-        $isConnect = false;
-        $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-        }
-
+    $pdo = dbConect();
+    
     $stmt = $pdo->prepare("SELECT * FROM reservation_settings WHERE id = :id");
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     $res = $stmt->execute();

@@ -1,23 +1,16 @@
 <?php
 
+require_once 'db.php';
+
 function accountStore($name,$email,$compnay_name,$phone,$sales_office){
     
-    try {
-        /// DB接続を試みる
-        $pdo  = new PDO('mysql:host=' . HOSTNAME . ';dbname=' . DATABASE, USERNAME, PASSWORD);
-        $msg = "MySQL への接続確認が取れました。";
-        } catch (PDOException $e) {
-        $isConnect = false;
-        $msg       = "MySQL への接続に失敗しました。<br>(" . $e->getMessage() . ")";
-        }
-
-
+    $pdo = dbConect();
+    
     $stmt = $pdo->prepare("INSERT INTO accounts (
                 name, email, company_name, sales_office, phone
             ) VALUES (
                :name, :email, :company_name,:sales_office, :phone
              )");
-    $date = new DateTime();
     $stmt->bindValue(':name', $name, PDO::PARAM_STR);
     $stmt->bindValue(':email', $email, PDO::PARAM_STR);
     $stmt->bindValue(':company_name', $compnay_name, PDO::PARAM_STR);
@@ -32,6 +25,22 @@ function accountStore($name,$email,$compnay_name,$phone,$sales_office){
     return $id;
 }
 
+function emailSearch($email){
+    
+    $pdo = dbConect();
+
+    $stmt = $pdo->prepare("SELECT * FROM accounts WHERE email = :email" );
+    $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+    $res = $stmt->execute();
+
+    if( $res ) {
+        $data = $stmt->fetch();
+    }
+
+    $pdo = NULL;
+
+    return $data;
+}
 
 
 

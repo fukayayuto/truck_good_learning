@@ -1,6 +1,7 @@
 <?php
 ini_set('display_errors', "On");
 require "../../db/reservation_settings.php"; 
+require "../../db/reservation.php"; 
 require "../../db/entries.php"; 
 
 $data = array();
@@ -11,18 +12,22 @@ $reservation_data = getDataMie($today);
 foreach ($reservation_data as $k => $val){
   $tmp = array();
   $tmp['id'] = $val['id'];
+
+  $reserve_data = getReservatinData($val['place']);
+  
+
   // $weekday = ['日', '月', '火', '水', '木', '金', '土'];
-  $progress = (int) $val['progress'];
+  $progress = (int) $reserve_data['progress'] - 1;
   // $start_date = new Carbon($val);
   $start_date = new DateTime($val['start_date']);
   
-  $tmp['start_date'] = $start_date->format('m月d日');
+  $tmp['start_date'] = $start_date->format('n月j日');
 
   $week = array( "日", "月", "火", "水", "木", "金", "土" );
   $tmp['start_week'] = $week[$start_date->format("w")];
 
   $end_date = $start_date->modify('+' .$progress . 'days');
-  $tmp['end_date'] = $end_date->format('m月d日');
+  $tmp['end_date'] = $end_date->format('n月j日');
   $tmp['end_week'] = $week[$end_date->format("w")];
 
   $entry = getEntry($val['id']);
@@ -34,14 +39,18 @@ foreach ($reservation_data as $k => $val){
       }
   }
     $tmp['id'] = $val['id'];
-    $tmp['left_seat'] = $val['count'] - $count;
+    $tmp['left_seat'] = $reserve_data['count'] - $count;
     $tmp['display'] = 0;
 
     if($num >= 4){
       $tmp['display'] = 1;
     }
 
-    $num++;
+    if($val['display_flg'] == 1){
+      $num++;
+  }
+  $tmp['display_flg'] = $val['display_flg'];
+  
 
   $data[$k] = $tmp;
 }
@@ -400,44 +409,42 @@ WEBからのご予約は下記受講開始日の<span>席数ボタン</span>か�
 				  <th></th>
 				  <th>三重会場</th>
 				  </tr></thead>
-			  <tbody>
+          <tbody>
           <?php foreach($data as $val) :?>
             <?php if($val['display'] == 0):?>
-            <tr>
-              <td><?php echo $val['start_date'] ?><span>(<?php echo $val['start_week'] ?>)</span>～<?php echo $val['end_date']?><span>(<?php echo $val['end_week'] ?>)</span></td>
-              <td></td>
-
-              <?php if($val['left_seat'] > 0):?>
-                  <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
-              <?php else:?>
-                 <td><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></td>
-              <?php endif;?>
-         
+              <?php if($val['display_flg'] == 1):?>
+                <tr>
+                  <td><?php echo $val['start_date'] ?><span>(<?php echo $val['start_week'] ?>)</span>～<?php echo $val['end_date']?><span>(<?php echo $val['end_week'] ?>)</span></td>
+                  <td></td>
+                  <?php if($val['left_seat'] > 0):?>
+                      <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
+                  <?php else:?>
+                      <td><button class="member" disabled>残り<span><?php echo $val['left_seat'];?></span>席</button></td>
+                  <?php endif;?>
                 </tr>
+                <?php endif;?>
             <?php endif;?>
           <?php endforeach; ?>
 			  </tbody>
 
         <tbody id="display" style="display: none;">
-          <?php foreach($data as $val) :?>
+        <?php foreach($data as $val) :?>
             <?php if($val['display'] == 1):?>
-            <tr>
-              <td><?php echo $val['start_date'] ?><span>(<?php echo $val['start_week'] ?>)</span>～<?php echo $val['end_date']?><span>(<?php echo $val['end_week'] ?>)</span></td>
-              <td></td>
-
-              <?php if($val['left_seat'] > 0):?>
-                  <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
-              <?php else:?>
-                 <td><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></td>
-              <?php endif;?>
-
-            
-
-           
-            </tr>
+              <?php if($val['display_flg'] == 1):?>
+                <tr>
+                  <td><?php echo $val['start_date'] ?><span>(<?php echo $val['start_week'] ?>)</span>～<?php echo $val['end_date']?><span>(<?php echo $val['end_week'] ?>)</span></td>
+                  <td></td>
+                  <?php if($val['left_seat'] > 0):?>
+                      <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
+                  <?php else:?>
+                      <td><button class="member" disabled>残り<span><?php echo $val['left_seat'];?></span>席</button></td>
+                  <?php endif;?>
+                </tr>
+                <?php endif;?>
             <?php endif;?>
           <?php endforeach; ?>
 			  </tbody>
+
       
       </table>
 			  <div class="moreLoad">
