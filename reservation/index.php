@@ -11,7 +11,7 @@ if(isset($_GET['id'])) {
 $data = array();
 $reservation_data = getReservation($reservation_id);
 if(empty($reservation_data)){
-    header('Location: http://localhost:8888/truck/price');
+    // header('Location: http://localhost:8888/truck/price');
 }
 $data['id'] = $reservation_data['id'];
 

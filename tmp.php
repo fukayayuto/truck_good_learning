@@ -260,41 +260,6 @@ foreach ($information_nomal_data as $key => $value){
               </li>
               <?php endforeach;?>
             <?php endif;?>
-
-
-
-
-
-              <li>
-                <span>2021.11.12</span
-                ><a href="/truck/adopt/">株式会社孝栄様</a
-                >にご採用頂きました。
-              </li>
-               <li>
-                <span>2021.11.04</span
-                ><a href="/truck/adopt/">G's Logicom株式会社様</a
-                >にご採用頂きました。
-              </li>
-               <li>
-                <span>2021.11.01</span
-                ><a href="/truck/adopt/">株式会社九建運送様</a
-                >にご採用頂きました。
-              </li>
-               <li>
-                <span>2021.10.29</span
-                ><a href="/truck/adopt/">協和興運株式会社様</a
-                >にご採用頂きました。
-              </li>
-              <li>
-                <span>2021.10.22</span
-                ><a href="/truck/adopt/">有限会社成田商事様</a
-                >にご採用頂きました。
-              </li>
-               <li>
-                <span>2021.10.12</span
-                ><a href="/truck/adopt/">有限会社美珠商事様</a
-                >にご採用頂きました。
-              </li>
               </ul>
           </div>
         </div>
