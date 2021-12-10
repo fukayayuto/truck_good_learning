@@ -4,6 +4,9 @@ require "../db/reservation_settings.php";
 require "../db/reservation.php"; 
 require "../db/entries.php"; 
 
+session_start();
+unset($_SESSION["flg"]);
+
 $data = array();
 $num = 0;
 $today = new DateTime();
@@ -39,7 +42,9 @@ foreach ($reservation_data as $k => $val){
 
     if(!empty($entry)){
       foreach ($entry as $item) {
-          $count = $count + $item['count'];
+          if($item['status'] != 2){
+            $count = $count + $item['count'];
+          }
         }
     }
     $tmp['id_nomember'] = $tmp_reservation_data['id'];
@@ -52,7 +57,9 @@ foreach ($reservation_data as $k => $val){
 
   if(!empty($entry)){
       foreach ($entry as $item) {
+        if($item['status'] != 2){
           $count = $count + $item['count'];
+        }
       }
   }
     $tmp['id'] = $val['id'];
@@ -71,6 +78,8 @@ foreach ($reservation_data as $k => $val){
   $data[$k] = $tmp;
 }
 }
+
+
 
 
 

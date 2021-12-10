@@ -33,7 +33,7 @@ function getDataDef($today){
 
     $pdo = dbConect();
 
-    $stmt = $pdo->prepare("SELECT * FROM reservation_settings WHERE place = :place and start_date > :today");
+    $stmt = $pdo->prepare("SELECT * FROM reservation_settings WHERE place = :place and start_date >= :today ORDER BY start_date");
     $stmt->bindValue(':place', 1, PDO::PARAM_INT);
     $stmt->bindValue(':today', $today, PDO::PARAM_STR);
     $res = $stmt->execute();

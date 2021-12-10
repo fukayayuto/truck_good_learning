@@ -1,155 +1,173 @@
-
 <?php
-ini_set('display_errors', "On");
-
+session_start();
+require "../db/reservation.php"; 
 require "../db/reservation_settings.php"; 
 require "../db/entries.php"; 
 require "../db/accounts.php"; 
 require "../db/mail.php"; 
 require "../db/mail_template.php"; 
 
+
+
+if(!empty($_SESSION["flg"])){
+  header('Location: https://promote.good-learning.jp/truck/price');
+}
+
+
 if(empty($_POST)){
-    header('Location: http://localhost:8888/truck/price');
+    header('Location: https://promote.good-learning.jp/truck/price');
 }
 
-$name = $_POST['name'];
-$email = $_POST['email'];
-$company_name = $_POST['company_name'];
-$phone = $_POST['phone'];
-$sales_office = $_POST['sales_office'];
 
-$account_id = accountStore($name,$email,$company_name,$phone,$sales_office);
+if(empty($_SESSION["flg"])){
 
-$reservation_id = $_POST['id'];
-$count = $_POST['count'];
+  $name = $_POST['name'];
+  $email = $_POST['email'];
+  $company_name = $_POST['company_name'];
+  $phone = $_POST['phone'];
+  $sales_office = $_POST['sales_office'];
 
-$res = entryStore($account_id,$reservation_id,$count);
+  $account_id = accountStore($name,$email,$company_name,$phone,$sales_office);
 
-if(!$res){
-  die('アカウント登録に失敗しました');
+  $reservation_id = $_POST['id'];
+  $reserve_data = getReservation($reservation_id);
+  $reserve_data = getReservatinData($reserve_data['place']);
+  $price = $reserve_data["price"];
+
+  $count = $_POST['count'];
+
+  $res = entryStore($account_id,$reservation_id,$count);
+
+  if(!$res){
+    die('アカウント登録に失敗しました');
+  }
+  
+  
+
+  $mail = $_POST["email"];
+
+
+  // $mailTemplateData = getMailTemplate(1);
+
+  // $mail_template = $mailTemplateData['text'];
+
+  // $name = $_POST['name'];
+  // $reservation_name = $_POST['reservation_name'];
+  // $start_date = $_POST['start_date'];
+  // $start_week = $_POST['start_week'];
+  // $count = $_POST['count'];
+  // $price = '11000';
+
+  // $search = array('{{氏名}}', '{{予約名}}','{{開始日}}', '{{開始曜日}}','{{予約人数}}', '{{講座金額}}');
+  // $replace = array($name, $reservation_name,$start_date,$start_week,$count,$price);
+  // $mail_template = str_replace($search, $replace, $mail_template);
+
+
+  $mail_body_1 = $_POST['name'] . "様\n\n";
+  $mail_body_1 .= "下記の通り、サービスの予約申請を受付しました。\n";
+  $mail_body_1 .= "本メールの時点では、まだ予約は確定されていません。\n";
+  $mail_body_1 .= "予約が「確定」もしくは「キャンセル」となった場合に、再度メールが送付されますのでご確認ください。\n\n";
+  $mail_body_1 .= "◆ご予約内容:\n";
+  $mail_body_1 .= $_POST['reservation_name'] . "\n";
+  $mail_body_1 .= "◆提供者:\n";
+  $mail_body_1 .= "グッドラーニング！\n";
+  $mail_body_1 .= "◆予約日時:\n";
+  $mail_body_1 .= $_POST['start_date'] . "(" . $_POST['start_week'] . ") 08:00 ~ 20:00 (予約人数:" . $_POST['count'] . ")\n";
+  $mail_body_1 .= "◆金額:\n";
+  $mail_body_1 .= $price . "円\n";
+  $mail_body_1 .= "◆「グッドラーニング！初任運転者講習（受講開始日で予約、最長７日間まで受講可能）」について:\n";
+  $mail_body_1 .= "受講開始日より最長７日間、任意の時間に受講することができます。\n";
+  $mail_body_1 .= "～～～～～講座内容～～～～～\n";
+  $mail_body_1 .= "◆講座内容は国交省の「初任運転者に対する特別な指導」により規定されている１２項目です。\n";
+  $mail_body_1 .= "◆実際の車両を用いて行う指導項目は含まれていません。\n";
+  $mail_body_1 .= "◆国土交通省の定める必要学習時間１５時間のうちの１２時間に相当します。\n";
+  $mail_body_1 .= "◆講座は全部で１５講座あります。\n";
+  $mail_body_1 .= "～～～～～受講開始までの流れ～～～～～\n";
+  $mail_body_1 .= "◆予約「確定」のメールのあとに、グッドラーニング！運営事務局より受講案内メールが届きます。\n";
+  $mail_body_1 .= "◆受講開始日になりましたら、受講案内にしたがって受講を開始してください。\n";
+  $mail_body_1 .= "◆受講期間は７日間です。７日以内にすべての講座を受講して下さい。\n";
+  $mail_body_1 .= "◆◆◆グッドラーニング！運営事務局◆◆◆\n";
+  $mail_body_1 .= "株式会社キャブステーション　ICTソリューション事業部\n";
+  $mail_body_1 .= "TEL：03-6880-1072　FAX：03-6880-1075\n";
+  $mail_body_1 .= "Mail：icts01@cab-station.com\n";
+
+
+  $inquiry_content = "申し込み情報\n";
+  $inquiry_content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+  $inquiry_content .= "予約内容\n";
+  $inquiry_content .= "【" . $_POST["reservation_name"] . "】\n";
+  $inquiry_content .= "講座期間:" . $_POST["start_date"] .'〜'. $_POST["end_date"] . "\n";
+  $inquiry_content .= "予約人数:" . $_POST["count"] .'人'. "\n\n";
+
+  $inquiry_content .= "お客様情報\n";
+  $inquiry_content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+  $inquiry_content .= "氏名:" . $_POST["name"] . "様\n";
+  $inquiry_content .= "メールアドレス:". $_POST["email"] . "\n";
+  $inquiry_content .= "会社名:". $_POST["company_name"] . "\n";
+  $inquiry_content .= "営業所:" . $_POST["sales_office"] . "\n";
+  $inquiry_content .= "電話番号:". $_POST["phone"] . "\n";
+
+
+  // //2通のメールのそれぞれの本文
+  $mail_body_2 = "齋藤様\n\n";
+  $mail_body_2 .= "このメールはシステムから自動送信しています。\n";
+  $mail_body_2 .= "「グッドラーニング！」から予約が入りました。\n\n\n";
+  $mail_body_2 .= $inquiry_content;
+
+
+  //メールの作成
+  $mail_to_2	= "yuto.fukaya@cab-station.com";
+  $mail_subject_2	= "【グッドラーニング】予約確認メール";
+  $mail_header_2	= "from:" . $mail ;
+
+  $mail_to_1	= $mail;
+  $mail_subject_1	= "[予約完了メール] グッドラーニング";
+  $mail_header_1	= "from:icts01@cab-station.com";
+
+
+
+  //メールの作成
+  $mail_to	= "yuto.fukaya@cab-station.com";
+  $mail_subject	= "【グッドラーニング】予約確認メール";
+  $mail_header	= "from:" . $mail ;
+
+
+  //メール送信処理
+  mb_language("Japanese");
+  mb_internal_encoding("UTF-8");
+
+  $mailsousin_1 = mb_send_mail($mail_to_1, $mail_subject_1, $mail_body_1, $mail_header_1);
+  $mailsousin_2 = mb_send_mail($mail_to_2, $mail_subject_2, $mail_body_2, $mail_header_2);
+
+
+
+  $adress_id = getAdressId();
+  $adress_id++;
+
+  $res = adressListStore($adress_id, $account_id);
+
+  if(!$res){
+    die('1');
+  }
+
+  $title = $mail_subject_1;
+  $mail_text = $mail_body_1;
+
+  $email_content_id = emailContentStore($title, $mail_text,$adress_id);
+
+  if(empty($email_content_id)){
+    die('2');
+  }
+
+  $res = emailStore($email_content_id);
+
+  if(!$res){
+    die('3');
+  }
+
 }
 
-$mail = $_POST["email"];
-
-
-// $mailTemplateData = getMailTemplate(1);
-
-// $mail_template = $mailTemplateData['text'];
-
-// $name = $_POST['name'];
-// $reservation_name = $_POST['reservation_name'];
-// $start_date = $_POST['start_date'];
-// $start_week = $_POST['start_week'];
-// $count = $_POST['count'];
-// $price = '11000';
-
-// $search = array('{{氏名}}', '{{予約名}}','{{開始日}}', '{{開始曜日}}','{{予約人数}}', '{{講座金額}}');
-// $replace = array($name, $reservation_name,$start_date,$start_week,$count,$price);
-// $mail_template = str_replace($search, $replace, $mail_template);
-
-
-$mail_body_1 = $_POST['name'] . "様\n\n";
-$mail_body_1 .= "下記の通り、サービスの予約申請を受付しました。\n";
-$mail_body_1 .= "本メールの時点では、まだ予約は確定されていません。\n";
-$mail_body_1 .= "予約が「確定」もしくは「キャンセル」となった場合に、再度メールが送付されますのでご確認ください。\n\n";
-$mail_body_1 .= "◆ご予約内容:\n";
-$mail_body_1 .= $_POST['reservation_name'] . "\n";
-$mail_body_1 .= "◆提供者:\n";
-$mail_body_1 .= "グッドラーニング！\n";
-$mail_body_1 .= "◆予約日時:\n";
-$mail_body_1 .= $_POST['start_date'] . "(" . $_POST['start_week'] . ") 08:00 ~ 20:00 (予約人数:" . $_POST['count'] . ")\n";
-$mail_body_1 .= "◆金額:\n";
-$mail_body_1 .= "11000円\n";
-$mail_body_1 .= "◆「グッドラーニング！初任運転者講習（受講開始日で予約、最長７日間まで受講可能）」について:\n";
-$mail_body_1 .= "受講開始日より最長７日間、任意の時間に受講することができます。\n";
-$mail_body_1 .= "～～～～～講座内容～～～～～\n";
-$mail_body_1 .= "◆講座内容は国交省の「初任運転者に対する特別な指導」により規定されている１２項目です。\n";
-$mail_body_1 .= "◆実際の車両を用いて行う指導項目は含まれていません。\n";
-$mail_body_1 .= "◆国土交通省の定める必要学習時間１５時間のうちの１２時間に相当します。\n";
-$mail_body_1 .= "◆講座は全部で１５講座あります。\n";
-$mail_body_1 .= "～～～～～受講開始までの流れ～～～～～\n";
-$mail_body_1 .= "◆予約「確定」のメールのあとに、グッドラーニング！運営事務局より受講案内メールが届きます。\n";
-$mail_body_1 .= "◆受講開始日になりましたら、受講案内にしたがって受講を開始してください。\n";
-$mail_body_1 .= "◆受講期間は７日間です。７日以内にすべての講座を受講して下さい。\n";
-$mail_body_1 .= "◆◆◆グッドラーニング！運営事務局◆◆◆\n";
-$mail_body_1 .= "株式会社キャブステーション　ICTソリューション事業部\n";
-$mail_body_1 .= "TEL：03-6880-1072　FAX：03-6880-1075\n";
-$mail_body_1 .= "Mail：icts01@cab-station.com\n";
-
-
-$inquiry_content = "申し込み情報\n";
-$inquiry_content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-$inquiry_content .= "予約内容\n";
-$inquiry_content .= "【" . $_POST["reservation_name"] . "】\n";
-$inquiry_content .= "講座期間:" . $_POST["start_date"] .'〜'. $_POST["end_date"] . "\n";
-$inquiry_content .= "予約人数:" . $_POST["count"] .'人'. "\n\n";
-
-$inquiry_content .= "お客様情報\n";
-$inquiry_content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-$inquiry_content .= "氏名:" . $_POST["name"] . "様\n";
-$inquiry_content .= "メールアドレス:". $_POST["email"] . "\n";
-$inquiry_content .= "会社名:". $_POST["company_name"] . "\n";
-$inquiry_content .= "営業所:" . $_POST["sales_office"] . "\n";
-$inquiry_content .= "電話番号:". $_POST["phone"] . "\n";
-
-
-// //2通のメールのそれぞれの本文
-$mail_body_2 = "齋藤様\n\n";
-$mail_body_2 .= "このメールはシステムから自動送信しています。\n";
-$mail_body_2 .= "「グッドラーニング！」から予約が入りました。\n\n\n";
-$mail_body_2 .= $inquiry_content;
-
-
-//メールの作成
-$mail_to_2	= "yuto.fukaya@cab-station.com";
-$mail_subject_2	= "【グッドラーニング】予約確認メール";
-$mail_header_2	= "from:" . $mail ;
-
-$mail_to_1	= $mail;
-$mail_subject_1	= "[予約完了メール] グッドラーニング";
-$mail_header_1	= "from:icts01@cab-station.com";
-
-
-
-//メールの作成
-$mail_to	= "yuto.fukaya@cab-station.com";
-$mail_subject	= "【グッドラーニング】予約確認メール";
-$mail_header	= "from:" . $mail ;
-
-
-//メール送信処理
-mb_language("Japanese");
-mb_internal_encoding("UTF-8");
-
-$mailsousin_1 = mb_send_mail($mail_to_1, $mail_subject_1, $mail_body_1, $mail_header_1);
-$mailsousin_2 = mb_send_mail($mail_to_2, $mail_subject_2, $mail_body_2, $mail_header_2);
-
-
-
-$adress_id = getAdressId();
-$adress_id++;
-
-$res = adressListStore($adress_id, $account_id);
-
-if(!$res){
-  die('1');
-}
-
-$title = $mail_subject_1;
-$mail_text = $mail_body_1;
-
-$email_content_id = emailContentStore($title, $mail_text,$adress_id);
-
-if(empty($email_content_id)){
-  die('2');
-}
-
-$res = emailStore($email_content_id);
-
-if(!$res){
-  die('3');
-}
-
+$_SESSION['flg'] = 1;
 
 
 ?>
@@ -277,7 +295,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <p class="thanksTxt">
             この度は「初任運転者講座」をお申し込みいただき、誠にありがとうございます。<br />
               <br />
-              折り返し、弊社担当より連絡申し上げます。今しばらくお待ちくださいませ。<br />
+              <b>折り返し、弊社担当より連絡申し上げます。今しばらくお待ちくださいませ。</b><br />
               <br />
               なお、入力いただいたメールアドレス宛に受付完了メールを配信致しました。<br />
               しばらくの時間が経過しても受付完了メールが届かない場合、処理が正常に行われていない可能性、メールアドレスの相違などが考えられます。<br /><br />大変お手数ではございますが、弊社まで連絡を頂戴できれば幸いです。<br />電話：03-6880-1064（平日 9:30〜17:30）

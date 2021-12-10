@@ -37,7 +37,9 @@ $used_seat = 0;
 
 $entry = getEntry($reservation_data['id']);
 foreach ($entry as $val) {
+  if($val['status'] != 2){
     $used_seat = $used_seat + $val['count'];
+  }
 }
 $left_seat = $reservation_total_seat - $used_seat;
 

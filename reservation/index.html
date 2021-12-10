@@ -1,71 +1,3 @@
-<?php
-ini_set('display_errors', "On");
-require "../../db/reservation_settings.php"; 
-require "../../db/reservation.php"; 
-require "../../db/entries.php"; 
-
-session_start();
-unset($_SESSION["flg"]);
-
-$data = array();
-$num = 0;
-$today = new DateTime();
-$today = $today->format('y-m-d');
-$reservation_data = getDataMie($today);
-foreach ($reservation_data as $k => $val){
-  $tmp = array();
-  $tmp['id'] = $val['id'];
-
-  $reserve_data = getReservatinData($val['place']);
-  
-
-  // $weekday = ['日', '月', '火', '水', '木', '金', '土'];
-  $progress = (int) $reserve_data['progress'] - 1;
-  // $start_date = new Carbon($val);
-  $start_date = new DateTime($val['start_date']);
-  
-  $tmp['start_date'] = $start_date->format('n月j日');
-
-  $week = array( "日", "月", "火", "水", "木", "金", "土" );
-  $tmp['start_week'] = $week[$start_date->format("w")];
-
-  $end_date = $start_date->modify('+' .$progress . 'days');
-  $tmp['end_date'] = $end_date->format('n月j日');
-  $tmp['end_week'] = $week[$end_date->format("w")];
-
-  $entry = getEntry($val['id']);
-  $count = 0;
-
-  if(!empty($entry)){
-      foreach ($entry as $item) {
-        if($item['status'] != 2){
-          $count = $count + $item['count'];
-        }
-      }
-  }
-    $tmp['id'] = $val['id'];
-    $tmp['left_seat'] = $reserve_data['count'] - $count;
-    $tmp['display'] = 0;
-
-    if($num >= 4){
-      $tmp['display'] = 1;
-    }
-
-    if($val['display_flg'] == 1){
-      $num++;
-  }
-  $tmp['display_flg'] = $val['display_flg'];
-  
-
-  $data[$k] = $tmp;
-}
-
-
-
-?>
-
-
-
 <!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -120,9 +52,9 @@ foreach ($reservation_data as $k => $val){
       media="print"
       onload="this.media=’all'"
     />
-    <link href="../../common/css/default.css" rel="stylesheet" type="text/css" />
-    <link href="../../common/css/layout.css" rel="stylesheet" type="text/css" />
-    <link href="../../common/css/content.css" rel="stylesheet" type="text/css" />
+    <link href="../common/css/default.css" rel="stylesheet" type="text/css" />
+    <link href="../common/css/layout.css" rel="stylesheet" type="text/css" />
+    <link href="../common/css/content.css" rel="stylesheet" type="text/css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <?php @include($_SERVER['DOCUMENT_ROOT']."/truck/common/inc/head_before.inc")?>
   </head>
@@ -136,7 +68,7 @@ foreach ($reservation_data as $k => $val){
           <p id="headLogo">
             <a href="/truck/"
               ><img
-                src="../../common/img/shared/head_logo.svg"
+                src="../common/img/shared/head_logo.svg"
                 alt="グッドラーニング"
                 width="262"
                 height="50"
@@ -330,11 +262,8 @@ foreach ($reservation_data as $k => $val){
 
             <div id="optionPrice">
               <div class="info">
-                <h3><span>初任運転者講座受講料</span> </h3>
-                <p class="price">非会員<br>
-1名<span>11,000</span>円</p>
-                <p class="price">グッドラーニング!会員<br>
-1名<span>7,700</span>円</p>
+                <h3><span>初任運転者講座受講料</span> 一般受講者</h3>
+                <p class="price">1名<span>11,000</span>円</p>
                 <p>※受講料は事前払いです。</p>
                 <p class="bank">
                   【振込口座】<br />
@@ -346,7 +275,7 @@ foreach ($reservation_data as $k => $val){
               <ol>
                 <li>
                   <img
-                    src="../../common/img/price/ico_calendar.png"
+                    src="../common/img/price/ico_calendar.png"
                     alt="カレンダー"
                     width="155"
                     height="155"
@@ -354,13 +283,13 @@ foreach ($reservation_data as $k => $val){
                   />
                   <h3>受講予約</h3>
                   <p>
-                    <a href="#calendar">下記受講開始日の席数ボタン</a
-                    >より予約してください。予約にはメールアドレスが必要です。
+                    <a href="#calendar">下記カレンダー</a
+                    >より「受講開始日」を選択して予約してください。予約にはメールアドレスが必要です。
                   </p>
                 </li>
                 <li>
                   <img
-                    src="../../common/img/price/iico_pay.png"
+                    src="../common/img/price/iico_pay.png"
                     alt="支払い"
                     width="156"
                     height="156"
@@ -375,7 +304,7 @@ foreach ($reservation_data as $k => $val){
                 </li>
                 <li>
                   <img
-                    src="../../common/img/price/ico_training.png"
+                    src="../common/img/price/ico_training.png"
                     alt="受講"
                     width="155"
                     height="152"
@@ -388,7 +317,7 @@ foreach ($reservation_data as $k => $val){
                 </li>
                 <li>
                   <img
-                    src="../../common/img/price/ico_comp.png"
+                    src="../common/img/price/ico_comp.png"
                     alt="修了"
                     width="135"
                     height="148"
@@ -401,62 +330,12 @@ foreach ($reservation_data as $k => $val){
                 </li>
               </ol>
             </div>
-            
-	  <div id="application">
-		  <p class="info">受講期間は7日間のうち、ご都合が良いときに受講ください。<br>
-定員がございますので、お早めにお申し込みください。また、受付締め切りは、お申込みの2日前までとなっております。<br>
-WEBからのご予約は下記受講開始日の<span>席数ボタン</span>からご予約いただけます。</p>
-		  <div id="calendar">
-		  <table>
-			  <thead>
-			  <tr>
-				  <th>受講開始日～終了日</th>
-				  <th></th>
-				  <th>三重会場</th>
-				  </tr></thead>
-          <tbody>
-          <?php foreach($data as $val) :?>
-            <?php if($val['display'] == 0):?>
-              <?php if($val['display_flg'] == 1):?>
-                <tr>
-                  <td><?php echo $val['start_date'] ?><span>(<?php echo $val['start_week'] ?>)</span>～<?php echo $val['end_date']?><span>(<?php echo $val['end_week'] ?>)</span></td>
-                  <td></td>
-                  <?php if($val['left_seat'] > 0):?>
-                      <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
-                  <?php else:?>
-                      <td><button class="member" disabled>残り<span><?php echo $val['left_seat'];?></span>席</button></td>
-                  <?php endif;?>
-                </tr>
-                <?php endif;?>
-            <?php endif;?>
-          <?php endforeach; ?>
-			  </tbody>
-
-        <tbody id="display" style="display: none;">
-        <?php foreach($data as $val) :?>
-            <?php if($val['display'] == 1):?>
-              <?php if($val['display_flg'] == 1):?>
-                <tr>
-                  <td><?php echo $val['start_date'] ?><span>(<?php echo $val['start_week'] ?>)</span>～<?php echo $val['end_date']?><span>(<?php echo $val['end_week'] ?>)</span></td>
-                  <td></td>
-                  <?php if($val['left_seat'] > 0):?>
-                      <td><a href="/truck/reservation/?id=<?php echo $val['id'] ?>"><button class="member">残り<span><?php echo $val['left_seat'];?></span>席</button></a></td>
-                  <?php else:?>
-                      <td><button class="member" disabled>残り<span><?php echo $val['left_seat'];?></span>席</button></td>
-                  <?php endif;?>
-                </tr>
-                <?php endif;?>
-            <?php endif;?>
-          <?php endforeach; ?>
-			  </tbody>
-
-      
-      </table>
-			  <div class="moreLoad">
-			  <p id="more">さらに表示する</p>
-			  </div>
-		  </div>
-		  </div>
+            <div id="calendar">
+              <iframe
+                src="https://coubic.com/good-learning/widget/calendar/908288,644391?from_pc=month&from_sp=agendaThreeDay"
+                style="border: none; width: 100%; height: 600px"
+              ></iframe>
+            </div>
           </div>
         </div>
         <div id="contactBox">
@@ -475,7 +354,7 @@ WEBからのご予約は下記受講開始日の<span>席数ボタン</span>か�
         <div class="inner">
           <div class="footLogo">
             <img
-              src="../../common/img/shared/foot_logo.svg"
+              src="../common/img/shared/foot_logo.svg"
               alt="グッドラーニング"
               width=""
               height=""
@@ -516,13 +395,7 @@ WEBからのご予約は下記受講開始日の<span>席数ボタン</span>か�
 		</div>
     </div>
     <!-- js -->
-    <script src="../../common/js/common.js"></script>
-    <script>
-        $('#more').on('click', function() {
-            $('#display').show();
-            $("#more").hide();
-        });
-    </script>
+    <script src="../common/js/common.js"></script>
     <?php @include($_SERVER['DOCUMENT_ROOT']."/truck/common/inc/js_after.inc")?>
   </body>
 </html>

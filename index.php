@@ -1,3 +1,75 @@
+<?php
+
+require_once "db/information.php";
+
+$information_priority_data = getPriorityiInformation();
+$limit = 6 - count($information_priority_data);
+
+$information_nomal_data = getNormalInformation($limit);
+
+$priority_data = array();
+
+foreach ($information_priority_data as $k => $val){
+  $tmp = array();
+
+  $updated_at = new DateTime($val['updated_at']);
+  $tmp['updated_at'] = $updated_at->format('Y.m.d');
+
+  $title = $val['title'];
+  $link_part = $val['link_part'];
+  $tmp['link'] = $val['link'];
+  $tmp['link_part'] = $link_part;
+  $tmp['title'] = $title;
+
+  if(!is_null($link_part)){
+    $part_first = strstr($title, $link_part, true);
+    $left_part = strstr($title, $link_part);
+    $word_count = mb_strlen($link_part);
+    $part_final = mb_substr($left_part, $word_count);
+    $tmp['part_first'] = $part_first;
+    $tmp['part_final'] = $part_final;
+  }
+
+  $priority_data[$k] = $tmp;
+  
+
+}
+
+
+
+$normal_data = array();
+foreach ($information_nomal_data as $key => $value){
+  $tmp = array();
+
+  $updated_at = new DateTime($value['updated_at']);
+  $tmp['updated_at'] = $updated_at->format('Y.m.d');
+
+  $title = $value['title'];
+  $link_part = $value['link_part'];
+  $tmp['link_part'] = $link_part;
+  $tmp['link'] = $value['link'];
+
+  $tmp['title'] = $title;
+
+  if(!is_null($link_part)){
+    $part_first = strstr($title, $link_part, true);
+    $left_part = strstr($title, $link_part);
+    $word_count = mb_strlen($link_part);
+    $part_final = mb_substr($left_part, $word_count);
+    $tmp['part_first'] = $part_first;
+    $tmp['part_final'] = $part_final;
+  }
+
+  $normal_data[$key] = $tmp;
+
+}
+
+
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -138,6 +210,61 @@
           <div id="newsIn">
             <p id="newsTit">NEWS &amp; TOPICS</p>
             <ul>
+
+            <?php if(isset($priority_data)):?>
+              <?php foreach ($priority_data as $val):?>
+              <li>
+                  <span><?php echo $val['updated_at'];?></span>
+
+                  <?php if(!empty($val['part_first'])):?>
+                    <?php echo $val['part_first'];?>
+                  <?php endif;?>
+
+                  <?php if(!empty($val['link_part'])):?>
+                    <a href="<?php echo $val['link'];?>">
+                        <?php echo $val['link_part'];?>
+                    </a>
+                  <?php else:?>
+                       <?php echo $val['title'];?>
+                  <?php endif;?>
+
+                  <?php if(!empty($val['part_final'])):?>
+                    <?php echo $val['part_final'];?>
+                  <?php endif;?>            
+          
+              </li>
+              <?php endforeach;?>
+            <?php endif;?>
+
+            <?php if(isset($normal_data)):?>
+              <?php foreach ($normal_data as $val):?>
+              <li>
+                  <span><?php echo $val['updated_at'];?></span>
+
+                  <?php if(!empty($val['part_first'])):?>
+                    <?php echo $val['part_first'];?>
+                  <?php endif;?>
+
+                  <?php if(!empty($val['link_part'])):?>
+                    <a href="<?php echo $val['link'];?>">
+                        <?php echo $val['link_part'];?>
+                    </a>
+                  <?php else:?>
+                       <?php echo $val['title'];?>
+                  <?php endif;?>
+
+                  <?php if(!empty($val['part_final'])):?>
+                    <?php echo $val['part_final'];?>
+                  <?php endif;?>            
+          
+              </li>
+              <?php endforeach;?>
+            <?php endif;?>
+
+
+
+
+
               <li>
                 <span>2021.11.12</span
                 ><a href="/truck/adopt/">株式会社孝栄様</a
